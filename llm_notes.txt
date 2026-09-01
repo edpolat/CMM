@@ -1,0 +1,93 @@
+The SDK provides several essential methods:
+• get_logits_from_input_ids(input_ids: List[int]) -> List[float]
+Takes a list of token IDs and returns the logits produced by the LLM model.
+• get_path_to_vocab_file() -> str
+Returns the path to the vocabulary file containing the correspondence between
+token IDs and tokens.
+• encode(text: str) -> Tensor
+Encodes a text string into a tensor of token IDs using the model’s tokenizer.
+• decode(token_ids: List[int]) -> str (optional)
+Optionally decodes a list of token IDs back into a text string.
+￼clear
+￼
+￼
+
+SDK, çeşitli temel yöntemler sunar: 
+• get_logits_from_input_ids(input_ids: List[int]) -> List[float] 
+Bir belirteç kimlikleri listesi alır ve LLM modeli tarafından üretilen logitleri döndürür. 
+• get_path_to_vocab_file() -> str 
+Belirteç kimlikleri ve belirteçler arasındaki karşılığı içeren sözlük dosyasının yolunu döndürür. 
+• encode(text: str) -> Tensor 
+Modelin belirteçleyicisini kullanarak bir metin dizesini belirteç kimlikleri tensörüne kodlar. 
+• decode(token_ids: List[int]) -> str (isteğe bağlı) 
+İsteğe bağlı olarak bir belirteç kimlikleri listesini tekrar bir metin dizesine dönüştürür.
+
+__main__.py (ana program)
+    │
+    ├─ io_utils.py ile JSON dosyalarını oku
+    │   (func_def_reader, prompt_reader)
+    │
+    ├─ Her prompt için:
+    │   │
+    │   ├─ tokenizer_utils.py ile prompt'u encode et
+    │   │   (encode_prompt → başlangıç input_ids'i üret)
+    │   │
+    │   ├─ constrained.py ile fonksiyon adını üret
+    │   │   (her adımda: model.get_logits_from_input_ids() çağır,
+    │   │    tokenizer_utils.py'deki id_to_token + decode_ids ile
+    │   │    "şu ana kadar ne ürettim" diye takip et,
+    │   │    trie'a bakıp geçersiz tokenleri -infinity yap,
+    │   │    en olası geçerli tokeni seç, input_ids'e ekle,
+    │   │    tekrarla)
+    │   │
+    │   ├─ constrained.py ile parametreleri üret
+    │   │   (aynı mantık, ama trie yerine sayı/string kısıtlaması)
+    │   │
+    │   └─ models.py ile FunctionCallResult objesi oluştur
+    │
+    └─ io_utils.py ile sonuçları data/output/'a yaz
+
+
+
+Trie (Prefix Tree) nedir?
+Trie, kelimeleri ortak önekleri (prefix) paylaşacak şekilde bir ağaç yapısında saklayan 
+bir veri yapısı. Adı "retrieval" kelimesinden geliyor.
+Neden buna ihtiyacımız var
+Elimizde şu fonksiyon isimleri var (senin functions_definition.json'undan):
+
+￼
+
+fn_add_numbers
+fn_greet
+fn_reverse_string
+fn_get_square_root
+fn_substitute_string_with_regex
+Model, bu isimlerden birini token token üretecek. 
+Her adımda sana soru şu: 
+"Şu ana kadar ürettiğim metin parçası (örn. 'fn_g'), bu 5 isimden en az birinin başlangıcı mı?
+Eğer öyleyse, bir sonraki token olarak hangi tokenler mantıklı olur?"
+Basit ama yavaş bir yaklaşım (trie olmadan)
+Aslında trie olmadan da bunu yapabilirsin — her adımda, şu ana kadar ürettiğin string'i alıp, 
+tüm 5 ismin başına uyuyor mu diye tek tek str.startswith(...) ile kontrol edebilirsin
+
+Peki trie ne zaman gerçekten işe yarar
+Asıl kritik nokta şu: Sen aslında karakter bazında değil, token bazında ilerliyorsun. 
+Yani "fn_add_numbers" kelimesi tek bir string değil, birden fazla token'a bölünmüş olabilir 
+("fn", "_add", "_numbers" gibi — gerçek bölünme tokenizer'a bağlı). Senin çözmen gereken 
+asıl problem şu:
+"Şu ana kadar ürettiğim token dizisi (ID listesi), decode edildiğinde bir fonksiyon isminin 
+başlangıcına denk geliyor mu? Eğer öyleyse, vocab'daki 151.643 token'dan hangileri, bu diziye 
+eklendiğinde hâlâ geçerli bir başlangıç olmaya devam eder?"
+
+Somut örnek — trie'ın görünümü
+(kök)
+ └── f
+      └── n
+           └── _
+                ├── a → d → d → _ → n → u → m → b → e → r → s (son: fn_add_numbers)
+                ├── g
+                │    ├── r → e → e → t (son: fn_greet)
+                │    └── e → t → _ → s → q → u → a → r → e → _ → r → o → o → t (son: fn_get_square_root)
+                ├── r → e → v → e → r → s → e → _ → s → t → r → i → n → g (son: fn_reverse_string)
+                └── s → u → b → s → t → i → t → u → t → e → ... (son: fn_substitute_string_with_regex)
+
