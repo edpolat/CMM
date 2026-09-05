@@ -20,7 +20,9 @@ def func_def_reader(file_name: str) -> list[FunctionDefinition]:
             transformation_data = FunctionDefinition.model_validate(func)
             function.append(transformation_data)
     except ValidationError as e:
-        raise ValueError(f"Function definition does not match schema ({file_name}): {e}") from e
+        raise ValueError(
+            f"Function definition does not match schema ({file_name}): {e}"
+            ) from e
 
     return function
 
@@ -40,6 +42,7 @@ def prompt_reader(file_name: str) -> list[PromptEntry]:
             transformation_pmt = PromptEntry.model_validate(prompt)
             prompts.append(transformation_pmt)
     except ValidationError as e:
-        raise ValueError(f"Prompt entry does not match schema ({file_name}): {e}") from e
+        raise ValueError(
+            f"Prompt entry does not match schema ({file_name}): {e}") from e
 
     return prompts

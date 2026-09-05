@@ -91,3 +91,117 @@ print(root.children["f"].children["n"].children.keys())  # sadece "_" olmalı
 print(root.children["f"].children["n"].children["_"].children.keys())
 # "a", "g", "r" olmalı
 """
+
+"""
+valid token test
+from src.constrained import TrieNode, insert, valid_token_ids
+from llm_sdk import Small_LLM_Model
+from src.tokenizer_utils import build_id_to_token
+
+model = Small_LLM_Model()
+id_to_token = build_id_to_token(model)
+
+root = TrieNode()
+insert(root, "fn_add_numbers")
+insert(root, "fn_greet")
+insert(root, "reverse_string")
+
+valid = valid_token_ids(root, "", id_to_token)
+print(len(valid))
+for tid in valid[:10]:
+    print(tid, repr(id_to_token[tid]))
+"""
+
+"""
+from llm_sdk import Small_LLM_Model
+from src.tokenizer_utils import build_id_to_token, encode_prompt
+from src.constrained import TrieNode, insert, valid_token_ids, mask_logits
+
+model = Small_LLM_Model()
+id_to_token = build_id_to_token(model)
+
+root = TrieNode()
+insert(root, "fn_add_numbers")
+insert(root, "fn_greet")
+insert(root, "fn_reverse_string")
+
+prompt = "What is the sum of 2 and 3?"
+input_ids = encode_prompt(model, prompt)
+
+valid_ids = valid_token_ids(root, "", id_to_token)
+logits = model.get_logits_from_input_ids(input_ids)
+masked = mask_logits(logits, valid_ids)
+
+print(len(masked))
+best = masked.index(max(masked))
+print(best, repr(id_to_token[best]))
+"""
+
+
+"""
+fonksiyon ismi doğru seçiliyor mu testi.
+from llm_sdk import Small_LLM_Model
+from src.tokenizer_utils import build_id_to_token, encode_prompt
+from src.constrained import TrieNode, insert, generate_function_name
+
+model = Small_LLM_Model()
+id_to_token = build_id_to_token(model)
+
+root = TrieNode()
+insert(root, "fn_add_numbers")
+insert(root, "fn_greet")
+insert(root, "fn_reverse_string")
+
+prompt = "Reverse the string 'hello'"
+input_ids = encode_prompt(model, prompt)
+
+name, generated_ids = generate_function_name(model, input_ids, id_to_token, root)
+print(name)
+print(generated_ids)
+"""
+
+"""
+
+from llm_sdk import Small_LLM_Model
+from src.tokenizer_utils import build_id_to_token
+from src.constrained import valid_number_token_ids
+
+model = Small_LLM_Model()
+id_to_token = build_id_to_token(model)
+
+valid = valid_number_token_ids("", id_to_token)
+print(len(valid))
+for tid in valid[:15]:
+    print(tid, repr(id_to_token[tid]))
+"""
+
+"""
+parametre üretim testi
+from llm_sdk import Small_LLM_Model
+from src.tokenizer_utils import build_id_to_token, encode_prompt
+from src.constrained import generate_number
+
+model = Small_LLM_Model()
+id_to_token = build_id_to_token(model)
+
+prompt = "What is the sum of 2 and 3? The first number is"
+input_ids = encode_prompt(model, prompt)
+
+number, generated_ids = generate_number(model, input_ids, id_to_token)
+print(repr(number))
+print(generated_ids)
+"""
+
+"""from llm_sdk import Small_LLM_Model
+from src.tokenizer_utils import build_id_to_token, encode_prompt
+from src.constrained import generate_string
+
+model = Small_LLM_Model()
+id_to_token = build_id_to_token(model)
+
+prompt = 'Greet Eda\n{"name": "fn_greet", "parameters": {"name": "'
+input_ids = encode_prompt(model, prompt)
+
+s, ids = generate_string(model, input_ids, id_to_token)
+print(repr(s))
+print(ids)"""

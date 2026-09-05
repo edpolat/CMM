@@ -91,3 +91,13 @@ Somut örnek — trie'ın görünümü
                 ├── r → e → v → e → r → s → e → _ → s → t → r → i → n → g (son: fn_reverse_string)
                 └── s → u → b → s → t → i → t → u → t → e → ... (son: fn_substitute_string_with_regex)
 
+
+logits → [2.3, 0.1, -1.5, 5.8, -0.2] gibi, 151.643 elemanlı, her eleman bir float (skor). 
+Bu listenin indeksleri (0, 1, 2, 3, 4, ...) aynı zamanda token ID'lerine karşılık geliyor.
+
+"""ParamType — izin verilen tip isimleri (number/string/boolean)
+ParameterSchema — {"type": ...} şeklini temsil ediyor, 
+hem parameters değerleri hem de returns için kullanılıyor
+FunctionDefinition — functions_definition.json'daki her fonksiyon kaydı
+PromptEntry — function_calling_tests.json'daki her girdi
+FunctionCallResult — senin üreteceğin çıktının şekli"""

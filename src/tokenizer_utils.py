@@ -1,6 +1,7 @@
 from llm_sdk import Small_LLM_Model
 import json
 
+
 def build_id_to_token(model: Small_LLM_Model) -> dict[int, str]:
     vocab_path = model.get_path_to_vocab_file()
     with open(vocab_path) as token_file:
