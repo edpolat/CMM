@@ -64,7 +64,8 @@ def generate_call(
     for param_name, schema in func_is.parameters.items():
         if schema.type == ParamType.STRING:
             param_prompt = (
-                f'{prompt_text}\nParameter {param_name} (string): "'
+                f'{prompt_text}\nRequest: "{entry.prompt}"'
+                f'\nParameter {param_name} (string) value: "'
             )
             param_ids = encode_prompt(model, param_prompt)
             text, _ = generate_string(model, param_ids, id_to_token)
@@ -72,7 +73,8 @@ def generate_call(
 
         elif schema.type == ParamType.NUMBER:
             param_prompt = (
-                f"{prompt_text}\nParameter {param_name} (number):"
+                f'{prompt_text}\nRequest: "{entry.prompt}"'
+                f'\nParameter {param_name} (number) value:'
             )
             param_ids = encode_prompt(model, param_prompt)
             text, _ = generate_number(model, param_ids, id_to_token)
@@ -80,7 +82,8 @@ def generate_call(
 
         elif schema.type == ParamType.BOOLEAN:
             param_prompt = (
-                f"{prompt_text}\nParameter {param_name} (boolean):"
+                f'{prompt_text}\nRequest: "{entry.prompt}"'
+                f'\nParameter {param_name} (boolean) value:'
             )
             param_ids = encode_prompt(model, param_prompt)
             text, _ = generate_boolean(model, param_ids, id_to_token)

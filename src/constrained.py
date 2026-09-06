@@ -113,12 +113,18 @@ def is_valid_number_prefix(text: str) -> bool:
     return True
 
 
+def strip_leading_marker(token_str: str) -> str:
+    return token_str[1:] if token_str.startswith("Ġ") else token_str
+
+
 def number_candidate_ids(id_to_token: dict[int, str]) -> list[int]:
     allowed = set("0123456789-.")
-    return [
-        t_id for t_id, t_str in id_to_token.items()
-        if t_str and all(c in allowed for c in t_str)
-    ]
+    candidates = []
+    for t_id, t_str in id_to_token.items():
+        cleaned = strip_leading_marker(t_str)
+        if cleaned and all(c in allowed for c in cleaned):
+            candidates.append(t_id)
+    return candidates
 
 
 def valid_number_token_ids(
@@ -126,8 +132,8 @@ def valid_number_token_ids(
 ) -> list[int]:
     valid = []
     for t_id in candidates:
-        candicate = text + id_to_token[t_id]
-        if is_valid_number_prefix(candicate):
+        cleaned = strip_leading_marker(id_to_token[t_id])
+        if is_valid_number_prefix(text + cleaned):
             valid.append(t_id)
     return valid
 
@@ -146,9 +152,6 @@ def generate_number(
         raw_best = raw_logits.index(max(raw_logits))
         raw_best_str = id_to_token.get(raw_best, "")
         has_digit = any(c.isdigit() for c in text)
-
-        # Eğer zaten en az bir rakam ürettiysek VE model artık
-        # sayı olmayan bir şey üretmek istiyorsa -> sayı bitti, dur.
         if has_digit and not is_valid_number_prefix(text + raw_best_str):
             break
 
@@ -157,8 +160,8 @@ def generate_number(
         if not valid_ids or max(masked) == float("-inf"):
             break
         best = masked.index(max(masked))
-        generated_ids.append(best)
-        text += id_to_token[best]
+    generated_ids.append(best)
+    text += strip_leading_marker(id_to_token[best])
     text = text.rstrip(".")
     if text in ("", "-"):
         text = "0"

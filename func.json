@@ -1,0 +1,104 @@
+[
+  {
+    "name": "fn_multiply_numbers",
+    "description": "Multiply two numbers together and return their product.",
+    "parameters": {
+      "x": {
+        "type": "number"
+      },
+      "y": {
+        "type": "number"
+      }
+    },
+    "returns": {
+      "type": "number"
+    }
+  },
+  {
+    "name": "fn_greet",
+    "description": "Generate a casual greeting message for a person by name.",
+    "parameters": {
+      "name": {
+        "type": "string"
+      }
+    },
+    "returns": {
+      "type": "string"
+    }
+  },
+  {
+    "name": "fn_greet_formally",
+    "description": "Generate a formal greeting for a person using their name and title.",
+    "parameters": {
+      "name": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      }
+    },
+    "returns": {
+      "type": "string"
+    }
+  },
+  {
+    "name": "fn_format_text",
+    "description": "Return a text unchanged, or converted to uppercase if requested.",
+    "parameters": {
+      "text": {
+        "type": "string"
+      },
+      "uppercase": {
+        "type": "boolean"
+      }
+    },
+    "returns": {
+      "type": "string"
+    }
+  },
+  {
+    "name": "fn_repeat_string",
+    "description": "Repeat a string a given number of times.",
+    "parameters": {
+      "s": {
+        "type": "string"
+      },
+      "times": {
+        "type": "number"
+      }
+    },
+    "returns": {
+      "type": "string"
+    }
+  },
+  {
+    "name": "fn_calculate_discount",
+    "description": "Calculate the final price after a percentage discount, optionally including tax.",
+    "parameters": {
+      "price": {
+        "type": "number"
+      },
+      "percentage": {
+        "type": "number"
+      },
+      "apply_tax": {
+        "type": "boolean"
+      }
+    },
+    "returns": {
+      "type": "number"
+    }
+  },
+  {
+    "name": "fn_check_palindrome",
+    "description": "Check whether a given string reads the same forwards and backwards.",
+    "parameters": {
+      "text": {
+        "type": "string"
+      }
+    },
+    "returns": {
+      "type": "boolean"
+    }
+  }
+]
