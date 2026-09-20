@@ -198,12 +198,19 @@ from llm_sdk import Small_LLM_Model
 from src.tokenizer_utils import build_id_to_token, encode_prompt
 from src.constrained import generate_string
 from src.generator import generate_call
+import json
 
 model = Small_LLM_Model()
-id_to_token = build_id_to_token(model)
+file = model.get_path_to_vocab_file()
+with open(file) as f2:
+    diction = json.load(f2)
+print(diction)
+
+"""id_to_token = build_id_to_token(model)
 
 prompt = 'Greet eda\n{"name": "fn_greet", "parameters": {"name": "'
 input_ids = encode_prompt(model, prompt)
 s, ids = generate_string(model, input_ids, id_to_token)
 print(repr(s))
 print(ids)
+"""

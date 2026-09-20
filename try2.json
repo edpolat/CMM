@@ -1,0 +1,54 @@
+[
+  {
+    "prompt": "What is 7 times 8?",
+    "name": "fn_multiply_numbers",
+    "parameters": {
+      "x": 7.0,
+      "y": 8.0
+    }
+  },
+  {
+    "prompt": "Multiply -12 and 4",
+    "name": "fn_multiply_numbers",
+    "parameters": {
+      "x": -12.0,
+      "y": 4.0
+    }
+  },
+  {
+    "prompt": "Convert 'hello world' to uppercase",
+    "name": "fn_check_palindrome",
+    "parameters": {
+      "text": "hello world"
+    }
+  },
+  {
+    "prompt": "Leave 'Hello World' unchanged, don't make it uppercase",
+    "name": "fn_check_palindrome",
+    "parameters": {
+      "text": "Hello World"
+    }
+  },
+  {
+    "prompt": "Is 'racecar' a palindrome?",
+    "name": "fn_check_palindrome",
+    "parameters": {
+      "text": "racecar"
+    }
+  },
+  {
+    "prompt": "Check if 'hello' is a palindrome",
+    "name": "fn_check_palindrome",
+    "parameters": {
+      "text": "hello"
+    }
+  },
+  {
+    "prompt": "Multiply 1000000 and 999999",
+    "name": "fn_multiply_numbers",
+    "parameters": {
+      "x": 1000000.0,
+      "y": 999999.0
+    }
+  }
+]

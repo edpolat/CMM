@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 from llm_sdk import Small_LLM_Model
+import math
+from .tokenizer_utils import encode_prompt
 
 
 class TrieNode(BaseModel):
@@ -62,6 +64,38 @@ def mask_logits(logits: list[float], valid_ids: list[int]) -> list[float]:
         else:
             valid_logit.append(float("-inf"))
     return valid_logit
+
+
+def log_softmax(logits: list[float]) -> list[float]:
+    max_logit = max(logits)
+    shifted = [x - max_logit for x in logits]
+    log_sum_exp = math.log(sum(math.exp(x) for x in shifted))
+    return [x - log_sum_exp for x in shifted]
+
+
+def score_sequence(model, input_ids, candidate_ids) -> float:
+    if not candidate_ids:
+        return float("-inf")
+    total = 0.0
+    context = list(input_ids)
+    for token_id in candidate_ids:
+        logits = model.get_logits_from_input_ids(context)
+        log_probs = log_softmax(logits)
+        total += log_probs[token_id]
+        context.append(token_id)      # adayın kendi token'ını zorla ekle
+    return total / len(candidate_ids)
+
+
+def select_best_candidate(model, input_ids, candidates: list[str]) -> str:
+    best_candidate = candidates[0]
+    best_score = float("-inf")
+    for candidate in candidates:
+        candidate_ids = encode_prompt(model, " " + candidate)
+        score = score_sequence(model, input_ids, candidate_ids)
+        if score > best_score:
+            best_score = score
+            best_candidate = candidate
+    return best_candidate
 
 
 def generate_function_name(
@@ -150,7 +184,7 @@ def generate_number(
     while len(generated_ids) < max_tokens:
         raw_logits = model.get_logits_from_input_ids(input_ids + generated_ids)
         raw_best = raw_logits.index(max(raw_logits))
-        raw_best_str = id_to_token.get(raw_best, "")
+        raw_best_str = strip_leading_marker(id_to_token.get(raw_best, ""))
         has_digit = any(c.isdigit() for c in text)
         if has_digit and not is_valid_number_prefix(text + raw_best_str):
             break
@@ -160,8 +194,8 @@ def generate_number(
         if not valid_ids or max(masked) == float("-inf"):
             break
         best = masked.index(max(masked))
-    generated_ids.append(best)
-    text += strip_leading_marker(id_to_token[best])
+        generated_ids.append(best)
+        text += strip_leading_marker(id_to_token[best])
     text = text.rstrip(".")
     if text in ("", "-"):
         text = "0"

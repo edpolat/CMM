@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "llm-sdk",
+    "moulinette",
     "numpy>=2.5.2",
     "pydantic>=2.13.4",
 ]
@@ -13,7 +14,9 @@ dependencies = [
 [tool.uv.workspace]
 members = [
     "llm_sdk",
+    "moulinette",
 ]
 
 [tool.uv.sources]
 llm-sdk = { workspace = true }
+moulinette = { workspace = true }

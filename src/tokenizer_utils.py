@@ -24,3 +24,13 @@ def decode_ids(id_to_token: dict[int, str], token_ids: list[int]) -> str:
         decoded_str += id_to_token[id]
     decoded_str = decoded_str.replace("Ġ", " ")
     return decoded_str
+
+
+if __name__ == "__main__":
+    model = Small_LLM_Model()
+    i2t = build_id_to_token(model)
+    assert len(i2t) > 100000
+    ids = encode_prompt(model, "What is the sum of 2 and 3?")
+    assert all(isinstance(x, int) for x in ids)
+    print(decode_ids(i2t, ids))   # metni geri vermeli
+    print("tokenizer_utils ok")

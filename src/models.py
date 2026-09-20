@@ -28,3 +28,19 @@ class FunctionCallResult(BaseModel):
     prompt: str
     name: str
     parameters: dict[str, bool | int | float | str]
+
+
+if __name__ == "__main__":
+    good = {"name": "fn_x", "description": "d",
+            "parameters": {"a": {"type": "number"}},
+            "returns": {"type": "string"}}
+    fd = FunctionDefinition.model_validate(good)
+
+    from pydantic import ValidationError
+    try:
+        FunctionDefinition.model_validate({"name": "fn_x"})
+    except ValidationError:
+        print("eksik alan yakalandı")
+
+    r = FunctionCallResult(prompt="p", name="fn_x", parameters={"a": 2.0})
+    print("models ok")

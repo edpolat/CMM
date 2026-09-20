@@ -46,3 +46,24 @@ def prompt_reader(file_name: str) -> list[PromptEntry]:
             f"Prompt entry does not match schema ({file_name}): {e}") from e
 
     return prompts
+
+if __name__ == "__main__":
+    import json, tempfile, os
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        json.dump([{"prompt": "Greet john"}], f)
+        path = f.name
+
+    for bad in ["yok.json"]:
+        try:
+            prompt_reader(bad)
+        except ValueError as e:
+            print("beklenen hata:", e)
+
+    with open(path, "w") as f:
+        f.write("{bozuk json")
+    try:
+        prompt_reader(path)
+    except ValueError as e:
+        print("beklenen hata:", e)
+    os.remove(path)
+    print("io_utils ok")

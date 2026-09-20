@@ -7,6 +7,7 @@ from .constrained import (
     generate_number,
     generate_string,
     generate_boolean,
+    select_best_candidate
 )
 from .models import (
     FunctionCallResult,
@@ -53,11 +54,10 @@ def generate_call(
     id_to_token: dict[int, str],
     entry: PromptEntry,
 ) -> FunctionCallResult:
-    root: TrieNode = build_function_trie(func_defs)
     promted = build_prompt(func_defs, entry.prompt)
     input_ids = encode_prompt(model, promted)
-    func_name, dec = generate_function_name(
-        model, input_ids, id_to_token, root)
+    candidate_names = [d.name for d in func_defs]
+    func_name = select_best_candidate(model, input_ids, candidate_names)
     func_is: FunctionDefinition = find_function(func_defs, func_name)
     prompt_text = promted + " " + func_is.name
     parameters: dict[str, bool | int | float | str] = {}
